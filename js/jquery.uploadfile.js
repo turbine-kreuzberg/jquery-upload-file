@@ -197,19 +197,21 @@
         //This is for showing Old files to user.
         this.createProgress = function (filename,filepath,filesize) {
             var pd = new createProgressDiv(this, s);
-            var dataSets = {};
-            dataSets[filename] = {name:filename, path:filepath, size:filesize};
+            var file = {name:filename, path:filepath, size:filesize};
+            var dataObject = {}; dataObject[filename] = file;
+            var files = [dataObject];
+            
             pd.progressDiv.show();
             pd.progressbar.width('100%');
 
             var fileNameStr = "";
             if(s.showFileCounter) 
-            	fileNameStr = obj.fileCounter + s.fileCounterStyle + dataSets.data( filename ).name;
-            else fileNameStr = dataSets.data( filename ).name;
+            	fileNameStr = obj.fileCounter + s.fileCounterStyle + file.name;
+            else fileNameStr = file.name;
             
             
             if(s.showFileSize)
-				fileNameStr += " ("+getSizeStr(dataSets.data( filename ).size)+")";
+				fileNameStr += " ("+getSizeStr(file.size)+")";
 
 
             pd.filename.html(fileNameStr);
@@ -217,14 +219,14 @@
             obj.selectedFiles++;
             if(s.showPreview)
             {
-                pd.preview.attr('src',dataSets.data( filename ).path);
+                pd.preview.attr('src',file.path);
                 pd.preview.show();
             }
             
             if(s.showDownload) {
                 pd.download.show();
                 pd.download.click(function () {
-                    if(s.downloadCallback) s.downloadCallback.call(obj, dataSets);
+                    if(s.downloadCallback) s.downloadCallback.call(obj, files);
                 });
             }
             if(s.showDelete)
@@ -232,7 +234,7 @@
 	            pd.del.show();
     	        pd.del.click(function () {
         	        pd.statusbar.hide().remove();
-                	if(s.deleteCallback) s.deleteCallback.call(this, dataSets, pd);
+                	if(s.deleteCallback) s.deleteCallback.call(this, files, pd);
 	                obj.selectedFiles -= 1;
     	            updateFileCounter(s, obj);
         	    });
