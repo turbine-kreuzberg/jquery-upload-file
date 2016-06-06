@@ -197,17 +197,19 @@
         //This is for showing Old files to user.
         this.createProgress = function (filename,filepath,filesize) {
             var pd = new createProgressDiv(this, s);
+            var dataSets = {};
+            dataSets[filename] = {name:filename, path:filepath, size:filesize};
             pd.progressDiv.show();
             pd.progressbar.width('100%');
 
             var fileNameStr = "";
             if(s.showFileCounter) 
-            	fileNameStr = obj.fileCounter + s.fileCounterStyle + filename;
-            else fileNameStr = filename;
+            	fileNameStr = obj.fileCounter + s.fileCounterStyle + dataSets.data( filename ).name;
+            else fileNameStr = dataSets.data( filename ).name;
             
             
             if(s.showFileSize)
-				fileNameStr += " ("+getSizeStr(filesize)+")";
+				fileNameStr += " ("+getSizeStr(dataSets.data( filename ).size)+")";
 
 
             pd.filename.html(fileNameStr);
@@ -215,14 +217,14 @@
             obj.selectedFiles++;
             if(s.showPreview)
             {
-                pd.preview.attr('src',filepath);
+                pd.preview.attr('src',dataSets.data( filename ).path);
                 pd.preview.show();
             }
             
             if(s.showDownload) {
                 pd.download.show();
                 pd.download.click(function () {
-                    if(s.downloadCallback) s.downloadCallback.call(obj, [filename]);
+                    if(s.downloadCallback) s.downloadCallback.call(obj, dataSets);
                 });
             }
             if(s.showDelete)
@@ -230,8 +232,7 @@
 	            pd.del.show();
     	        pd.del.click(function () {
         	        pd.statusbar.hide().remove();
-            	    var arr = [filename];
-                	if(s.deleteCallback) s.deleteCallback.call(this, arr, pd);
+                	if(s.deleteCallback) s.deleteCallback.call(this, dataSets, pd);
 	                obj.selectedFiles -= 1;
     	            updateFileCounter(s, obj);
         	    });
